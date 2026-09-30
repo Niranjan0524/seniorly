@@ -10,6 +10,15 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Product palette. Change these to restyle Seniorly. */
+  --color-ink: #121410;
+  --color-line: #31362c;
+  --color-paper: #eceae3;
+  --color-muted: #a8a292;
+  --color-brass: #d4c4a0;
+  --color-brass-strong: #e6d7b8;
+  --color-clay: #d4896a;
 }
 
 @media (prefers-color-scheme: dark) {

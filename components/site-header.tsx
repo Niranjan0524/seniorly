@@ -33,17 +33,17 @@ export async function SiteHeader() {
   }
 
   return (
-    <header className="flex items-center justify-between gap-4 border-b border-[#31362c] bg-[#121410] px-6 py-3 text-[#eceae3]">
-      <Link href="/" className="text-sm tracking-wide text-[#d4c4a0]">
+    <header className="flex items-center justify-between gap-4 border-b border-line bg-ink px-6 py-3 text-paper">
+      <Link href="/" className="text-sm tracking-wide text-brass">
         Seniorly
       </Link>
       {label ? (
         <div className="flex items-center gap-4">
-          <span className="max-w-48 truncate text-sm text-[#a8a292]">{label}</span>
+          <span className="max-w-48 truncate text-sm text-muted">{label}</span>
           <SignOutButton compact />
         </div>
       ) : (
-        <Link href="/signin" className="text-sm text-[#d4c4a0] hover:text-[#e6d7b8]">
+        <Link href="/signin" className="text-sm text-brass hover:text-brass-strong">
           Sign in
         </Link>
       )}

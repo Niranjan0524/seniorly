@@ -7,8 +7,8 @@ export function SignOutButton({ compact = false }: { compact?: boolean }) {
         type="submit"
         className={
           compact
-            ? "text-sm text-[#d4c4a0] hover:text-[#e6d7b8]"
-            : "rounded-lg border border-[#31362c] px-4 py-2 text-sm text-[#eceae3] hover:border-[#d4c4a0] hover:text-[#e6d7b8]"
+            ? "text-sm text-brass hover:text-brass-strong"
+            : "rounded-lg border border-line px-4 py-2 text-sm text-paper hover:border-brass hover:text-brass-strong"
         }
       >
         Sign out
