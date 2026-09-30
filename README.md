@@ -18,12 +18,10 @@ npm run build
 
 ## Environment
 
-Create `.env.local` when later milestones connect MongoDB Atlas and Supabase. These names are placeholders only; the app does not read them yet.
-
 ```bash
 MONGODB_URI=
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-`MONGODB_URI` stays server-side. Do not prefix it with `NEXT_PUBLIC_`.
+`NEXT_PUBLIC_SUPABASE_URL` is the project URL (`https://YOUR_PROJECT.supabase.co`). `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is the `sb_publishable_...` key. `MONGODB_URI` stays server-side. Do not put the `sb_secret_...` key in this file.
