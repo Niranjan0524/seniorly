@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
-import { SignOutButton } from "@/components/sign-out-button";
+import { BasicsForm } from "@/app/experiences/new/basics-form";
+import { connectDB } from "@/lib/db";
+import { CollegeModel } from "@/lib/models/college";
+import { UserModel } from "@/lib/models/user";
 import { readSession } from "@/lib/supabase/session";
 
 export default async function NewExperiencePage() {
@@ -17,19 +20,40 @@ export default async function NewExperiencePage() {
     redirect("/signin?next=/experiences/new");
   }
 
+  let colleges: { id: string; name: string }[] = [];
+  let initialCollegeId = "";
+
+  try {
+    await connectDB();
+    const [collegeDocs, profile] = await Promise.all([
+      CollegeModel.find().sort({ name: 1 }).select("name").lean(),
+      UserModel.findById(session.user.id).select("collegeId").lean(),
+    ]);
+    colleges = collegeDocs.map((college) => ({
+      id: String(college._id),
+      name: college.name,
+    }));
+    if (profile?.collegeId) {
+      initialCollegeId = String(profile.collegeId);
+    }
+  } catch {
+    return (
+      <main className="flex flex-1 bg-ink px-6 py-16 text-paper">
+        <p className="mx-auto max-w-xl text-sm text-clay">
+          Colleges could not be loaded. Try again in a moment.
+        </p>
+      </main>
+    );
+  }
+
   return (
     <main className="flex flex-1 bg-ink px-6 py-16 text-paper">
       <div className="mx-auto w-full max-w-xl">
-        <p className="text-sm text-muted">
-          Signed in as {session.user.email ?? session.user.id}
+        <h1 className="text-3xl">New interview experience</h1>
+        <p className="mt-3 text-muted">
+          Start with the company, role, and when you interviewed. Rounds come next.
         </p>
-        <h1 className="mt-3 text-3xl">New interview experience</h1>
-        <p className="mt-3 max-w-prose text-muted">
-          The form for company, rounds, and questions comes next. This page is only available after you sign in.
-        </p>
-        <div className="mt-8">
-          <SignOutButton />
-        </div>
+        <BasicsForm colleges={colleges} initialCollegeId={initialCollegeId} />
       </div>
     </main>
   );
