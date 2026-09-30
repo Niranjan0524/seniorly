@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/sign-out-button";
+import { SiteHeaderBar } from "@/components/site-header-bar";
 import { connectDB } from "@/lib/db";
 import { UserModel } from "@/lib/models/user";
 import { readSession } from "@/lib/supabase/session";
@@ -33,20 +34,17 @@ export async function SiteHeader() {
   }
 
   return (
-    <header className="flex items-center justify-between gap-4 border-b border-line bg-ink px-6 py-3 text-paper">
-      <Link href="/" className="text-sm tracking-wide text-brass">
-        Seniorly
-      </Link>
+    <SiteHeaderBar>
       {label ? (
         <div className="flex items-center gap-4">
-          <span className="max-w-48 truncate text-sm text-muted">{label}</span>
+          <span className="max-w-40 truncate text-sm text-muted">{label}</span>
           <SignOutButton compact />
         </div>
       ) : (
-        <Link href="/signin" className="text-sm text-brass hover:text-brass-strong">
+        <Link href="/signin" className="text-sm text-brass transition-colors duration-200 hover:text-brass-strong">
           Sign in
         </Link>
       )}
-    </header>
+    </SiteHeaderBar>
   );
 }

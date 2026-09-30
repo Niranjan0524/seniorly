@@ -1,36 +1,46 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-source-sans), "Source Sans 3", sans-serif;
+  --font-serif: var(--font-newsreader), Newsreader, serif;
 
-  /* Product palette. Change these to restyle Seniorly. */
   --color-ink: #121410;
   --color-panel: #1a1d18;
+  --color-fill: #22261f;
   --color-line: #31362c;
   --color-paper: #eceae3;
   --color-muted: #a8a292;
+  --color-faint: #7a756b;
   --color-brass: #d4c4a0;
   --color-brass-strong: #e6d7b8;
+  --color-sage: #9caf96;
   --color-clay: #d4896a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 450;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

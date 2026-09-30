@@ -13,10 +13,10 @@ export default async function SignInPage({
   const user = session.user;
 
   return (
-    <main className="flex flex-1 items-center bg-ink px-6 py-16 text-paper">
+    <main className="flex flex-1 items-center px-6 py-16">
       <div className="mx-auto w-full max-w-md">
-        <p className="text-sm tracking-wide text-brass">Seniorly</p>
-        <h1 className="mt-3 text-3xl text-paper">Sign in</h1>
+        <p className="text-sm tracking-[0.16em] text-brass">SENIORLY</p>
+        <h1 className="mt-3 text-4xl text-paper">Sign in</h1>
         <p className="mt-3 text-muted">
           Use Google to share an interview experience. Reading stays open without an account.
         </p>
@@ -37,7 +37,7 @@ export default async function SignInPage({
               <p className="text-sm text-muted">
                 Signed in as {user.email ?? user.id}
               </p>
-              <Link href="/experiences/new" className="text-sm text-brass hover:text-brass-strong">
+              <Link href="/experiences/new" className="text-sm text-brass transition-colors duration-200 hover:text-brass-strong">
                 Continue to a new experience
               </Link>
               <SignOutButton />

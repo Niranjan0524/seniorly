@@ -39,7 +39,7 @@ export function GoogleSignInButton() {
         type="button"
         onClick={signIn}
         disabled={pending}
-        className="rounded-lg bg-brass px-4 py-2.5 text-sm font-medium text-ink hover:bg-brass-strong disabled:opacity-60"
+        className="rounded-lg bg-brass px-4 py-2.5 text-sm font-medium text-ink transition-colors duration-200 hover:bg-brass-strong disabled:opacity-60"
       >
         {pending ? "Redirecting to Google…" : "Continue with Google"}
       </button>

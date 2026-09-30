@@ -10,7 +10,7 @@ export default async function NewExperiencePage() {
 
   if (session.configMessage) {
     return (
-      <main className="flex flex-1 bg-ink px-6 py-16 text-paper">
+      <main className="flex flex-1 px-6 py-16">
         <p className="mx-auto max-w-xl text-sm text-clay">{session.configMessage}</p>
       </main>
     );
@@ -38,7 +38,7 @@ export default async function NewExperiencePage() {
     }
   } catch {
     return (
-      <main className="flex flex-1 bg-ink px-6 py-16 text-paper">
+      <main className="flex flex-1 px-6 py-16">
         <p className="mx-auto max-w-xl text-sm text-clay">
           Colleges could not be loaded. Try again in a moment.
         </p>
@@ -47,11 +47,12 @@ export default async function NewExperiencePage() {
   }
 
   return (
-    <main className="flex flex-1 bg-ink px-6 py-16 text-paper">
+    <main className="flex flex-1 px-6 py-12">
       <div className="mx-auto w-full max-w-xl">
-        <h1 className="text-3xl">New interview experience</h1>
+        <p className="text-sm tracking-[0.16em] text-brass">SHARE</p>
+        <h1 className="mt-3 text-4xl">Share your experience</h1>
         <p className="mt-3 text-muted">
-          Start with the company, role, and when you interviewed. Rounds come next.
+          Company, role, and the rounds you sat. Preparation stays optional and comes after this.
         </p>
         <BasicsForm colleges={colleges} initialCollegeId={initialCollegeId} />
       </div>
