@@ -45,9 +45,16 @@ function copyFor(path: string) {
 }
 
 export function fieldErrorsFromZod(error: ZodError) {
+  return messagesFor(error.issues.map((issue) => issue.path.join(".")));
+}
+
+export function fieldErrorsFromApi(fields: Record<string, string[]>) {
+  return messagesFor(Object.keys(fields));
+}
+
+function messagesFor(paths: string[]) {
   const fields: Record<string, string> = {};
-  for (const issue of error.issues) {
-    const path = issue.path.join(".");
+  for (const path of paths) {
     if (!path || fields[path]) {
       continue;
     }

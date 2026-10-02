@@ -1,12 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { Field, PrimaryButton, SelectInput, TextArea, TextInput } from "@/components/form/fields";
 import { createRound, RoundsEditor, type RoundDraft } from "@/components/form/rounds-editor";
 import { opportunityTypes, selectionStatuses } from "@/lib/models/enums";
 import { experienceSchema } from "@/lib/validators/experience";
-import { buildExperienceInput, fieldErrorsFromZod } from "@/app/experiences/new/draft";
+import { buildExperienceInput, fieldErrorsFromApi, fieldErrorsFromZod } from "@/app/experiences/new/draft";
 
 type CollegeOption = {
   id: string;
@@ -56,6 +57,8 @@ export function BasicsForm({
   const [rounds, setRounds] = useState<RoundDraft[]>(() => [createRound("round-1", "question-1")]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
+  const [pending, setPending] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -111,8 +114,11 @@ export function BasicsForm({
     });
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (pending) {
+      return;
+    }
     const parsed = experienceSchema.safeParse(draftInput());
     if (!parsed.success) {
       setErrors(fieldErrorsFromZod(parsed.error));
@@ -129,6 +135,43 @@ export function BasicsForm({
 
     setErrors({});
     setFormError("");
+    setPending(true);
+
+    try {
+      const response = await fetch("/api/experiences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draftInput()),
+      });
+      const body = (await response.json().catch(() => null)) as {
+        id?: string;
+        error?: { message?: string; fieldErrors?: Record<string, string[]> };
+      } | null;
+
+      if (response.status === 401) {
+        setFormError("Sign in again to publish. Your answers are still here.");
+        return;
+      }
+
+      if (!response.ok) {
+        if (body?.error?.fieldErrors) {
+          setErrors(fieldErrorsFromApi(body.error.fieldErrors));
+        }
+        setFormError(body?.error?.message ?? "Could not publish. Try again.");
+        return;
+      }
+
+      if (!body?.id) {
+        setFormError("Could not publish. Try again.");
+        return;
+      }
+
+      router.push(`/experiences/${body.id}`);
+    } catch {
+      setFormError("Could not publish. Try again.");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -405,8 +448,8 @@ export function BasicsForm({
               {formError}
             </p>
           ) : null}
-          <PrimaryButton type="submit" className="self-start">
-            Publish experience
+          <PrimaryButton type="submit" className="self-start" disabled={pending}>
+            {pending ? "Publishing…" : "Publish experience"}
           </PrimaryButton>
         </section>
       </form>
