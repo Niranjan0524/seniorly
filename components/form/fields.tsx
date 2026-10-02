@@ -7,7 +7,7 @@ import type {
 } from "react";
 
 const controlClassName =
-  "w-full rounded-lg border border-line bg-panel px-3 py-2 text-paper outline-none transition-[border-color,background-color] duration-200 ease-out placeholder:text-faint focus:border-brass";
+  "w-full rounded-lg border border-line bg-panel px-3 py-2 text-paper outline-none transition-[border-color,background-color] duration-200 ease-out placeholder:text-faint focus:border-brass aria-invalid:border-clay";
 
 export function Field({
   label,
@@ -23,7 +23,7 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1.5" data-invalid={error ? true : undefined}>
       <label htmlFor={htmlFor} className="text-sm text-muted">
         {label}
       </label>

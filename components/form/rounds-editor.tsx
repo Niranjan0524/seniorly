@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Field, SecondaryButton, SelectInput, TextArea, TextInput } from "@/components/form/fields";
 import { difficulties, roundTypes, type Difficulty, type RoundType } from "@/lib/models/enums";
 
@@ -92,10 +92,20 @@ function roundSummary(round: RoundDraft) {
   return parts.join(" · ");
 }
 
+export type RoundFieldErrors = {
+  roundType?: string;
+  title?: string;
+  durationMinutes?: string;
+  notes?: string;
+  topics?: string;
+  questions: Array<string | undefined>;
+};
+
 function RoundCard({
   round,
   index,
   total,
+  errors,
   onMove,
   onRemove,
   onUpdate,
@@ -104,6 +114,7 @@ function RoundCard({
   round: RoundDraft;
   index: number;
   total: number;
+  errors?: RoundFieldErrors;
   onMove: (direction: -1 | 1) => void;
   onRemove: () => void;
   onUpdate: (updater: (round: RoundDraft) => RoundDraft) => void;
@@ -119,6 +130,13 @@ function RoundCard({
   );
   const [detailsOpen, setDetailsOpen] = useState(hasDetails);
   const summary = roundSummary(round);
+  const detailError = Boolean(errors?.title || errors?.durationMinutes || errors?.notes || errors?.topics);
+
+  useEffect(() => {
+    if (detailError) {
+      setDetailsOpen(true);
+    }
+  }, [detailError]);
 
   return (
     <section className="rounded-lg border border-line bg-panel p-4 sm:p-5">
@@ -159,10 +177,11 @@ function RoundCard({
       </div>
 
       <div className="mt-4">
-        <Field label="Round type" htmlFor={`${round.id}-type`}>
+        <Field label="Round type" htmlFor={`${round.id}-type`} error={errors?.roundType}>
           <SelectInput
             id={`${round.id}-type`}
             className="bg-fill"
+            aria-invalid={Boolean(errors?.roundType)}
             value={round.roundType}
             onChange={(event) =>
               onUpdate((current) => ({
@@ -197,8 +216,10 @@ function RoundCard({
               <span className="w-7 pt-2 text-sm text-faint tabular-nums">
                 {String(questionIndex + 1).padStart(2, "0")}
               </span>
+              <div className="flex min-w-0 flex-1 flex-col gap-1.5" data-invalid={errors?.questions[questionIndex] ? true : undefined}>
               <TextInput
                 aria-label={`Question ${questionIndex + 1}`}
+                aria-invalid={Boolean(errors?.questions[questionIndex])}
                 className="bg-fill"
                 value={question.prompt}
                 maxLength={1000}
@@ -212,6 +233,10 @@ function RoundCard({
                   }))
                 }
               />
+              {errors?.questions[questionIndex] ? (
+                <p className="text-sm text-clay">{errors.questions[questionIndex]}</p>
+              ) : null}
+              </div>
               {round.questions.length > 1 ? (
                 <button
                   type="button"
@@ -267,10 +292,11 @@ function RoundCard({
             >
               <div className="flex flex-col gap-4 pt-4">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Title" htmlFor={`${round.id}-title`} hint="Optional">
+                  <Field label="Title" htmlFor={`${round.id}-title`} hint="Optional" error={errors?.title}>
                     <TextInput
                       id={`${round.id}-title`}
                       className="bg-fill"
+                      aria-invalid={Boolean(errors?.title)}
                       value={round.title}
                       maxLength={120}
                       placeholder="Technical round 1"
@@ -283,10 +309,12 @@ function RoundCard({
                     label="Duration"
                     htmlFor={`${round.id}-duration`}
                     hint="Minutes, if you remember"
+                    error={errors?.durationMinutes}
                   >
                     <TextInput
                       id={`${round.id}-duration`}
                       className="bg-fill"
+                      aria-invalid={Boolean(errors?.durationMinutes)}
                       inputMode="numeric"
                       value={round.durationMinutes}
                       placeholder="45"
@@ -320,7 +348,7 @@ function RoundCard({
                   </Field>
                 </div>
 
-                <Field label="Topics" htmlFor={`${round.id}-topic`} hint="Optional, up to 12">
+                <Field label="Topics" htmlFor={`${round.id}-topic`} hint="Optional, up to 12" error={errors?.topics}>
                   <TextInput
                     id={`${round.id}-topic`}
                     className="bg-fill"
@@ -365,10 +393,11 @@ function RoundCard({
                   </ul>
                 ) : null}
 
-                <Field label="Notes" htmlFor={`${round.id}-notes`} hint="Optional">
+                <Field label="Notes" htmlFor={`${round.id}-notes`} hint="Optional" error={errors?.notes}>
                   <TextArea
                     id={`${round.id}-notes`}
                     className="bg-fill"
+                    aria-invalid={Boolean(errors?.notes)}
                     value={round.notes}
                     maxLength={4000}
                     placeholder="What the round focused on"
@@ -386,11 +415,44 @@ function RoundCard({
   );
 }
 
+function roundErrorsAt(errors: Record<string, string> | undefined, index: number): RoundFieldErrors | undefined {
+  if (!errors) {
+    return undefined;
+  }
+  const prefix = `rounds.${index}.`;
+  const questions: Array<string | undefined> = [];
+  for (const [path, message] of Object.entries(errors)) {
+    if (!path.startsWith(prefix) || !path.endsWith(".prompt")) {
+      continue;
+    }
+    const questionIndex = Number(path.slice(prefix.length).split(".")[1]);
+    if (Number.isInteger(questionIndex)) {
+      questions[questionIndex] = message;
+    }
+  }
+  const slice: RoundFieldErrors = {
+    roundType: errors[`${prefix}roundType`],
+    title: errors[`${prefix}title`],
+    durationMinutes: errors[`${prefix}durationMinutes`],
+    notes: errors[`${prefix}notes`],
+    topics:
+      errors[`${prefix}topics`] ??
+      Object.entries(errors).find(([path]) => path.startsWith(`${prefix}topics`))?.[1],
+    questions,
+  };
+  const hasError = Boolean(
+    slice.roundType || slice.title || slice.durationMinutes || slice.notes || slice.topics || questions.some(Boolean),
+  );
+  return hasError ? slice : undefined;
+}
+
 export function RoundsEditor({
   rounds,
+  errors,
   onChange,
 }: {
   rounds: RoundDraft[];
+  errors?: Record<string, string>;
   onChange: (rounds: RoundDraft[]) => void;
 }) {
   const idRef = useRef(2);
@@ -431,6 +493,7 @@ export function RoundsEditor({
               round={round}
               index={index}
               total={rounds.length}
+              errors={roundErrorsAt(errors, index)}
               onMove={(direction) => moveRound(index, direction)}
               onRemove={() => onChange(rounds.filter((item) => item.id !== round.id))}
               onUpdate={(updater) => updateRound(round.id, updater)}
