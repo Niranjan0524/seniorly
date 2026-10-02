@@ -1,9 +1,51 @@
 import { ZodError } from "zod";
 import { findOrCreateCompany } from "@/lib/companies";
 import { connectDB } from "@/lib/db";
+import type { ExperienceCardData } from "@/lib/experience-card";
 import { CollegeModel } from "@/lib/models/college";
 import { ExperienceModel } from "@/lib/models/experience";
+import type { OpportunityType } from "@/lib/models/enums";
 import { experienceSchema } from "@/lib/validators/experience";
+
+type ExperienceCardDoc = {
+  _id: unknown;
+  companyName: string;
+  roleTitle: string;
+  collegeName: string;
+  interviewYear: number;
+  opportunityType: OpportunityType;
+  roundCount: number;
+  advice?: string | null;
+};
+
+export async function listExperiences(): Promise<ExperienceCardData[]> {
+  await connectDB();
+  const docs = await ExperienceModel.aggregate<ExperienceCardDoc>([
+    { $sort: { createdAt: -1 } },
+    {
+      $project: {
+        companyName: 1,
+        roleTitle: 1,
+        collegeName: 1,
+        interviewYear: 1,
+        opportunityType: 1,
+        advice: 1,
+        roundCount: { $size: { $ifNull: ["$rounds", []] } },
+      },
+    },
+  ]);
+
+  return docs.map((doc) => ({
+    id: String(doc._id),
+    companyName: doc.companyName,
+    roleTitle: doc.roleTitle,
+    collegeName: doc.collegeName,
+    interviewYear: doc.interviewYear,
+    opportunityType: doc.opportunityType,
+    roundCount: doc.roundCount,
+    advice: doc.advice?.trim() ? doc.advice : null,
+  }));
+}
 
 type CreateFailure =
   | { ok: false; kind: "validation"; error: ZodError }
