@@ -5,6 +5,7 @@ import type { ExperienceCardData } from "@/lib/experience-card";
 import { CollegeModel } from "@/lib/models/college";
 import { ExperienceModel } from "@/lib/models/experience";
 import type { OpportunityType } from "@/lib/models/enums";
+import { experienceMongoFilter, type ExperienceFilterParams } from "@/lib/experience-filters";
 import { experienceSchema } from "@/lib/validators/experience";
 
 type ExperienceCardDoc = {
@@ -18,9 +19,10 @@ type ExperienceCardDoc = {
   advice?: string | null;
 };
 
-export async function listExperiences(): Promise<ExperienceCardData[]> {
+export async function listExperiences(filters: ExperienceFilterParams = {}): Promise<ExperienceCardData[]> {
   await connectDB();
   const docs = await ExperienceModel.aggregate<ExperienceCardDoc>([
+    { $match: experienceMongoFilter(filters) },
     { $sort: { createdAt: -1 } },
     {
       $project: {

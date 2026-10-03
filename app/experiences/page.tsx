@@ -1,19 +1,21 @@
+import { ExperienceFilters } from "@/components/experience-filters";
 import { ExperienceCard } from "@/components/experience-card";
+import { experienceFiltersFromParams } from "@/lib/experience-filters";
 import { listExperiences } from "@/lib/experiences";
 
 export default async function ExperiencesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { q } = await searchParams;
-  const query = q?.trim() ?? "";
+  const params = await searchParams;
+  const filters = experienceFiltersFromParams(params);
 
   let cards: Awaited<ReturnType<typeof listExperiences>> = [];
   let failed = false;
 
   try {
-    cards = await listExperiences();
+    cards = await listExperiences(filters);
   } catch {
     failed = true;
   }
@@ -23,11 +25,12 @@ export default async function ExperiencesPage({
       <div className="mx-auto w-full max-w-xl">
         <p className="text-sm tracking-[0.16em] text-brass">LIBRARY</p>
         <h1 className="mt-3 text-4xl text-paper">Experiences</h1>
-        {query ? (
-          <p className="mt-4 text-muted">“{query}” is in this search.</p>
+        {filters.q ? (
+          <p className="mt-4 text-muted">“{filters.q}” is in this search.</p>
         ) : (
           <p className="mt-4 text-muted">Interview experiences from seniors, one card at a time.</p>
         )}
+        <ExperienceFilters />
 
         {failed ? (
           <p className="mt-8 text-sm text-clay">Experiences could not be loaded. Try again in a moment.</p>
