@@ -17,6 +17,7 @@ export type ExperienceDetailRound = {
 export type ExperienceDetail = {
   id: string;
   companyName: string;
+  companySlug: string;
   roleTitle: string;
   collegeName: string;
   branch: string;
@@ -43,7 +44,7 @@ export async function getExperience(id: string): Promise<ExperienceDetail | null
   await connectDB();
   const document = await ExperienceModel.findById(id)
     .select(
-      "companyName roleTitle collegeName branch graduationYear interviewYear opportunityType selectionStatus preparation focusTopics resources advice rounds",
+      "companyName companySlug roleTitle collegeName branch graduationYear interviewYear opportunityType selectionStatus preparation focusTopics resources advice rounds",
     )
     .lean<ExperienceDetailDocument>();
 
