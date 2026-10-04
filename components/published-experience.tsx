@@ -32,7 +32,12 @@ export async function PublishedExperience({ id }: { id: string }) {
         ← Back to experiences
       </Link>
       <header className="mt-8 border-b border-line pb-8">
-        <p className="text-sm tracking-[0.16em] text-brass">{experience.companyName.toUpperCase()}</p>
+        <Link
+          href={`/companies/${experience.companySlug}`}
+          className="text-sm tracking-[0.16em] text-brass transition-colors duration-200 hover:text-brass-strong"
+        >
+          {experience.companyName.toUpperCase()}
+        </Link>
         <h1 className="mt-3 text-4xl text-paper">{experience.roleTitle}</h1>
         <p className="mt-4 text-muted">
           {experience.collegeName} · {experience.branch} · {experience.interviewYear}
