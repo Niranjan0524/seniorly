@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { BookmarkButton } from "@/components/bookmark-button";
+import { getBookmarkStatus } from "@/lib/bookmarks";
 import { getExperience, type ExperienceDetail } from "@/lib/experience-detail";
 import type { OpportunityType, RoundType } from "@/lib/models/enums";
+import { readSession } from "@/lib/supabase/session";
 
 const opportunityLabels: Record<OpportunityType, string> = {
   internship: "Internship",
@@ -22,6 +25,8 @@ export async function PublishedExperience({ id }: { id: string }) {
   if (!experience) {
     notFound();
   }
+  const session = await readSession();
+  const initialSaved = session.user ? await getBookmarkStatus(session.user.id, id) : false;
 
   return (
     <article className="mx-auto w-full max-w-2xl">
@@ -53,6 +58,7 @@ export async function PublishedExperience({ id }: { id: string }) {
           <Badge>{selectionLabel(experience.selectionStatus)}</Badge>
           <Badge>Graduating {experience.graduationYear}</Badge>
         </div>
+        <BookmarkButton experienceId={id} initialSaved={initialSaved} signedIn={Boolean(session.user)} />
       </header>
 
       <div className="divide-y divide-line">
