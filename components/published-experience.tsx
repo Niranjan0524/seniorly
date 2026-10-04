@@ -42,6 +42,12 @@ export async function PublishedExperience({ id }: { id: string }) {
         <p className="mt-4 text-muted">
           {experience.collegeName} · {experience.branch} · {experience.interviewYear}
         </p>
+        <Link
+          href={`/profiles/${experience.authorId}`}
+          className="mt-3 inline-block text-sm text-muted transition-colors duration-200 hover:text-brass"
+        >
+          View contributor profile →
+        </Link>
         <div className="mt-5 flex flex-wrap gap-2 text-sm text-faint">
           <Badge>{opportunityLabels[experience.opportunityType]}</Badge>
           <Badge>{selectionLabel(experience.selectionStatus)}</Badge>
