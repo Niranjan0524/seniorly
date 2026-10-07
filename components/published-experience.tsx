@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { BookmarkButton } from "@/components/bookmark-button";
+import { ExperienceComments } from "@/components/experience-comments";
 import { getBookmarkStatus } from "@/lib/bookmarks";
+import { listComments } from "@/lib/comments";
 import { getExperience, type ExperienceDetail } from "@/lib/experience-detail";
 import type { OpportunityType, RoundType } from "@/lib/models/enums";
 import { readSession } from "@/lib/supabase/session";
@@ -27,6 +29,7 @@ export async function PublishedExperience({ id }: { id: string }) {
   }
   const session = await readSession();
   const initialSaved = session.user ? await getBookmarkStatus(session.user.id, id) : false;
+  const comments = await listComments(id);
 
   return (
     <article className="mx-auto w-full max-w-2xl">
@@ -103,6 +106,7 @@ export async function PublishedExperience({ id }: { id: string }) {
           <DetailText value={experience.advice} />
         </DetailSection>
       </div>
+      <ExperienceComments experienceId={id} initialComments={comments} signedIn={Boolean(session.user)} />
     </article>
   );
 }
