@@ -50,6 +50,9 @@ export function SiteHeaderBar({ children }: { children: ReactNode }) {
             <Link href="/saved" className="text-muted transition-colors duration-200 hover:text-paper">
               Saved
             </Link>
+            <Link href="/contributions" className="text-muted transition-colors duration-200 hover:text-paper">
+              Your contributions
+            </Link>
             <Link
               href="/experiences/new"
               className="text-brass transition-colors duration-200 hover:text-brass-strong"

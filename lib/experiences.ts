@@ -49,6 +49,36 @@ export async function listExperiences(filters: ExperienceFilterParams = {}): Pro
   }));
 }
 
+export async function listExperiencesByAuthor(authorId: string): Promise<ExperienceCardData[]> {
+  await connectDB();
+  const docs = await ExperienceModel.aggregate<ExperienceCardDoc>([
+    { $match: { authorId } },
+    { $sort: { createdAt: -1 } },
+    {
+      $project: {
+        companyName: 1,
+        roleTitle: 1,
+        collegeName: 1,
+        interviewYear: 1,
+        opportunityType: 1,
+        advice: 1,
+        roundCount: { $size: { $ifNull: ["$rounds", []] } },
+      },
+    },
+  ]);
+
+  return docs.map((doc) => ({
+    id: String(doc._id),
+    companyName: doc.companyName,
+    roleTitle: doc.roleTitle,
+    collegeName: doc.collegeName,
+    interviewYear: doc.interviewYear,
+    opportunityType: doc.opportunityType,
+    roundCount: doc.roundCount,
+    advice: doc.advice?.trim() ? doc.advice : null,
+  }));
+}
+
 type CreateFailure =
   | { ok: false; kind: "validation"; error: ZodError }
   | { ok: false; kind: "college" };
